@@ -1,0 +1,9 @@
+[meta]
+uses_ansible = false
+uses_python = true
+meta_version = "0.7.dev0"
+project_name = "prefect-kghub-example-task"
+
+
+[money]
+project_number = "w0289"

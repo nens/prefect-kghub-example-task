@@ -1,18 +1,35 @@
-from prefect import flow
-from tasks import uppercase_the_text
+from datetime import datetime
+
+from prefect import flow, get_run_logger
+from tasks import get_precipitation, post_timeseries
+
+# Constants
+uuid_gpm_ts = "fb384ac4-c8e8-452e-83d3-30f23c522577"
+uuid_gpm_rast = "f23e174e-0636-45f1-86fd-e543a7aa49ac"
+
+
+start = datetime(2024, 11, 1, 0, 0, 0)
+end = datetime(2024, 11, 6, 0, 0, 0)
+coordinates = (74.590958, 42.871773, 0.0)
 
 
 @flow(
     name="Clear name of your flow",
-    flow_run_name = "kghub_example_task Flow run",
-    description= "Short description of what the flow does.",
-    retries=0, # If wanted, place your retries count here,
+    flow_run_name="kghub_example_task Flow run",
+    description="Short description of what the flow does.",
+    retries=0,  # If wanted, place your retries count here,
     retry_delay_seconds=10,
-    log_prints=True
+    log_prints=True,
 )
-def kghub_example_task_flow(text: str = "Hi"):
-    uppercase_text = uppercase_the_text(text)
-    print(f"Turned {text} into {uppercase_text}")
+def kghub_example_task_flow():
+    logger = get_run_logger()
+
+    logger.info("Downloading precipitation data from Dutch Lizard")
+    df = get_precipitation(uuid_gpm_rast, start, end, coordinates)
+
+    logger.info("Data downloaded, uploading to KGhub")
+
+    post_timeseries(uuid_gpm_ts, df)
 
 
 if __name__ == "__main__":

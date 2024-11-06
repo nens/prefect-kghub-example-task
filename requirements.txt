@@ -1,2 +1,5 @@
 prefect<3
 pytest
+pre-commit
+requests
+pandas

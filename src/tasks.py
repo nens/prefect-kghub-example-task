@@ -11,6 +11,8 @@ kghub_api = "http://kghub.caiag.kg/api"
 
 @task(retries=2)
 def get_precipitation(uuid, start, end, coordinates):
+    logger = get_run_logger()
+
     lizard_api_key = Secret.load("lizard-api-key").get()
 
     lizard_headers = {
@@ -19,7 +21,6 @@ def get_precipitation(uuid, start, end, coordinates):
         "Content-Type": "application/json",
     }
 
-    logger = get_run_logger()
     url = f"{lizard_api}/rasters/{uuid}/point/"
     lat = coordinates[0]
     lon = coordinates[1]
@@ -41,6 +42,7 @@ def get_precipitation(uuid, start, end, coordinates):
 
 @task(retries=2)
 def post_timeseries(ts_uuid, df_data):
+    logger = get_run_logger()
     kghub_token = Secret.load("kghub-token").get()
 
     kghub_headers = {
@@ -52,8 +54,8 @@ def post_timeseries(ts_uuid, df_data):
     events = df_data[["time", "value"]].to_dict(orient="records")
 
     # POST each event to the server
-    response = requests.post(
-        url=events_url, data=json.dumps(events), headers=kghub_headers
-    )
+    logger.info("Posting data")
+    r = requests.post(url=events_url, data=json.dumps(events), headers=kghub_headers)
 
-    return response.json()
+    r.raise_for_status()
+    logger.info("Timeseries POST completed")

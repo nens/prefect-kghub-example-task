@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from prefect import flow, get_run_logger
 from tasks import get_precipitation, post_timeseries
@@ -7,9 +7,6 @@ from tasks import get_precipitation, post_timeseries
 uuid_gpm_ts = "fb384ac4-c8e8-452e-83d3-30f23c522577"
 uuid_gpm_rast = "f23e174e-0636-45f1-86fd-e543a7aa49ac"
 
-
-start = datetime(2024, 11, 1, 0, 0, 0)
-end = datetime(2024, 11, 6, 0, 0, 0)
 coordinates = (74.590958, 42.871773, 0.0)
 
 
@@ -25,6 +22,9 @@ def kghub_example_task_flow():
     logger = get_run_logger()
 
     logger.info("Downloading precipitation data from Dutch Lizard")
+
+    end = datetime.now().replace(microsecond=0, second=0, minute=0)
+    start = end - timedelta(days=3)
     df = get_precipitation(uuid_gpm_rast, start, end, coordinates)
 
     logger.info("Data downloaded, uploading to KGhub")

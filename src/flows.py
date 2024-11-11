@@ -11,12 +11,11 @@ coordinates = (74.590958, 42.871773, 0.0)
 
 
 @flow(
-    name="Clear name of your flow",
+    name="Rainfall data Bishkek",
     flow_run_name="kghub_example_task Flow run",
-    description="Short description of what the flow does.",
-    retries=0,  # If wanted, place your retries count here,
+    description="Download rainfall datafrom GPM raster in Dutch Lizard and upload  to KGhub as a timeseries",
+    retries=1,  # If wanted, place your retries count here,
     retry_delay_seconds=10,
-    log_prints=True,
 )
 def kghub_example_task_flow():
     logger = get_run_logger()
